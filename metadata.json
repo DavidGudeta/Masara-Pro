@@ -1,0 +1,8 @@
+{
+  "name": "Copy of Masara",
+  "description": "A comprehensive real estate platform featuring AI-powered valuations, role-based dashboards, multi-language support, and advanced property search.",
+  "requestFramePermissions": [
+    "camera",
+    "geolocation"
+  ]
+}
