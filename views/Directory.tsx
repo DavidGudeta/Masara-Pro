@@ -46,7 +46,7 @@ export const Directory: React.FC<DirectoryProps> = ({ user }) => {
         <div className="flex flex-col md:flex-row justify-between items-start md:items-end gap-6">
           <div className="space-y-2">
             <h1 className="text-3xl font-black text-slate-900 tracking-tight">Compliance Center</h1>
-            <p className="text-slate-500 max-w-xl font-medium">Global verification system for property owners, agencies, and risk assessment.</p>
+            <p className="text-slate-500 max-xl font-medium">Global verification system for property owners, agencies, and risk assessment.</p>
           </div>
           <div className="flex gap-2">
             <div className="relative">
@@ -77,7 +77,8 @@ export const Directory: React.FC<DirectoryProps> = ({ user }) => {
                 onClick={() => setSelectedCategory(cat.type)}
                 className={`w-full text-left px-5 py-3 rounded-2xl text-[11px] font-black uppercase tracking-widest flex items-center gap-3 transition-all ${selectedCategory === cat.type ? 'bg-blue-600 text-white' : 'bg-white border border-slate-100 text-slate-500 hover:bg-slate-50'}`}
               >
-                {React.cloneElement(cat.icon as React.ReactElement, { size: 16 })}
+                {/* Fix: cast to ReactElement<any> to allow 'size' prop */}
+                {React.cloneElement(cat.icon as React.ReactElement<any>, { size: 16 })}
                 {cat.label}
               </button>
             ))}

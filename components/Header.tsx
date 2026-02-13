@@ -213,7 +213,8 @@ export const Header: React.FC<HeaderProps> = ({
                     className="w-full flex items-center gap-4 px-4 py-3 text-[13px] font-bold text-slate-600 hover:bg-slate-50 hover:text-blue-600 rounded-2xl transition-all group"
                   >
                     <div className="text-slate-400 group-hover:text-blue-600 transition-colors">
-                      {React.cloneElement(item.icon as React.ReactElement, { size: 18, strokeWidth: 2.5 })}
+                      {/* Fix: cast to ReactElement<any> to allow 'size' and 'strokeWidth' props */}
+                      {React.cloneElement(item.icon as React.ReactElement<any>, { size: 18, strokeWidth: 2.5 })}
                     </div>
                     {t(language, item.labelKey as any)}
                   </button>

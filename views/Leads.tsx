@@ -5,10 +5,10 @@ import {
   MessageSquare, PieChart, TrendingUp, Users, Calendar, 
   DollarSign, CheckCircle2, ChevronRight, X, Send, 
   Paperclip, Clock, Plus, ArrowRightLeft, FileText,
-  Home
+  Home, UserPlus, Briefcase, ChevronDown
 } from 'lucide-react';
-import { MOCK_LEADS } from '../constants';
-import { User, Lead, LeadStage, LeadTask, LeadNote } from '../types';
+import { MOCK_LEADS, MOCK_PROPERTIES } from '../constants';
+import { User, Lead, LeadStage, LeadTask, LeadNote, Property } from '../types';
 
 interface LeadsProps {
   user?: User;
@@ -16,9 +16,19 @@ interface LeadsProps {
 
 export const Leads: React.FC<LeadsProps> = ({ user }) => {
   const isAdmin = user?.role === 'ADMIN';
+  const [leads, setLeads] = useState<Lead[]>(MOCK_LEADS);
   const [selectedLead, setSelectedLead] = useState<Lead | null>(null);
-  const [activeTab, setActiveTab] = useState<'DETAILS' | 'NOTES' | 'TASKS' | 'EMAIL'>('DETAILS');
+  const [activeTab, setActiveTab] = useState<'DETAILS' | 'EMAIL' | 'NOTES' | 'TASKS'>('DETAILS');
   const [searchQuery, setSearchQuery] = useState('');
+  
+  // Add Lead Form State
+  const [showAddModal, setShowAddModal] = useState(false);
+  const [newLead, setNewLead] = useState<Partial<Lead>>({
+    status: 'NEW',
+    source: 'Direct Inquiry',
+    notes: [],
+    tasks: []
+  });
 
   const stages: { id: LeadStage; label: string; color: string }[] = [
     { id: 'NEW', label: 'Inquiry', color: 'bg-blue-500' },
@@ -29,11 +39,37 @@ export const Leads: React.FC<LeadsProps> = ({ user }) => {
   ];
 
   const filteredLeads = useMemo(() => {
-    return MOCK_LEADS.filter(l => 
+    return leads.filter(l => 
       l.clientName.toLowerCase().includes(searchQuery.toLowerCase()) ||
       l.propertyTitle.toLowerCase().includes(searchQuery.toLowerCase())
     );
-  }, [searchQuery]);
+  }, [searchQuery, leads]);
+
+  const handleCreateLead = (e: React.FormEvent) => {
+    e.preventDefault();
+    const property = MOCK_PROPERTIES.find(p => p.id === newLead.propertyId);
+    
+    const leadToAdd: Lead = {
+      id: `l-${Date.now()}`,
+      clientName: newLead.clientName || 'Unnamed Client',
+      email: newLead.email || '',
+      phone: newLead.phone || '',
+      propertyTitle: property?.title || 'General Inquiry',
+      propertyId: newLead.propertyId || '',
+      status: (newLead.status as LeadStage) || 'NEW',
+      date: new Date().toLocaleDateString('en-US', { month: 'short', day: 'numeric', year: 'numeric' }),
+      lastMessage: 'Lead manually created',
+      avatar: `https://i.pravatar.cc/150?u=${Date.now()}`,
+      value: newLead.value || 0,
+      source: newLead.source || 'Manual Entry',
+      notes: [],
+      tasks: []
+    };
+
+    setLeads([leadToAdd, ...leads]);
+    setShowAddModal(false);
+    setNewLead({ status: 'NEW', source: 'Direct Inquiry', notes: [], tasks: [] });
+  };
 
   if (isAdmin) {
     return (
@@ -92,8 +128,8 @@ export const Leads: React.FC<LeadsProps> = ({ user }) => {
               </div>
               <div className="space-y-6">
                 {stages.map(s => {
-                  const count = MOCK_LEADS.filter(l => l.status === s.id).length;
-                  const percent = (count / MOCK_LEADS.length) * 100;
+                  const count = leads.filter(l => l.status === s.id).length;
+                  const percent = (count / leads.length) * 100;
                   return (
                     <div key={s.id} className="space-y-2">
                       <div className="flex justify-between text-xs font-black uppercase tracking-widest">
@@ -131,7 +167,10 @@ export const Leads: React.FC<LeadsProps> = ({ user }) => {
               placeholder="Search leads, properties, emails..." 
             />
           </div>
-          <button className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:scale-105 transition-all flex items-center gap-2">
+          <button 
+            onClick={() => setShowAddModal(true)}
+            className="px-6 py-3 bg-blue-600 text-white rounded-2xl font-black text-[11px] uppercase tracking-widest shadow-xl shadow-blue-200 hover:scale-105 transition-all flex items-center gap-2"
+          >
             <Plus size={16} /> New Lead
           </button>
         </div>
@@ -178,7 +217,10 @@ export const Leads: React.FC<LeadsProps> = ({ user }) => {
                     </div>
                   </div>
                 ))}
-                <button className="w-full py-4 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all text-[10px] font-black uppercase tracking-widest">
+                <button 
+                  onClick={() => setShowAddModal(true)}
+                  className="w-full py-4 border-2 border-dashed border-slate-200 rounded-3xl text-slate-400 hover:text-blue-600 hover:border-blue-200 transition-all text-[10px] font-black uppercase tracking-widest"
+                >
                   + Drop Lead Here
                 </button>
               </div>
@@ -187,9 +229,147 @@ export const Leads: React.FC<LeadsProps> = ({ user }) => {
         })}
       </div>
 
+      {/* New Lead Modal */}
+      {showAddModal && (
+        <div className="fixed inset-0 bg-slate-900/60 backdrop-blur-md z-[70] flex items-center justify-center p-4 animate-in fade-in duration-300">
+          <div 
+            className="bg-white w-full max-w-2xl rounded-[40px] shadow-2xl overflow-hidden animate-in zoom-in-95 duration-300 flex flex-col max-h-[90vh]"
+            onClick={e => e.stopPropagation()}
+          >
+            <div className="p-8 border-b border-slate-100 flex items-center justify-between bg-slate-50/50">
+              <div className="flex items-center gap-4">
+                <div className="w-12 h-12 bg-blue-600 rounded-2xl flex items-center justify-center text-white shadow-lg">
+                  <UserPlus size={24} />
+                </div>
+                <div>
+                  <h2 className="text-2xl font-black text-slate-900 tracking-tight">Create New Lead</h2>
+                  <p className="text-[10px] text-slate-400 font-black uppercase tracking-widest mt-1">Populate pipeline with new prospect</p>
+                </div>
+              </div>
+              <button onClick={() => setShowAddModal(false)} className="p-2 text-slate-400 hover:bg-slate-100 rounded-xl transition-colors">
+                <X size={20} />
+              </button>
+            </div>
+
+            <form onSubmit={handleCreateLead} className="p-8 space-y-6 overflow-y-auto hide-scrollbar">
+              <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <Users size={14} className="text-blue-600" /> Client Full Name
+                  </label>
+                  <input 
+                    required
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all"
+                    placeholder="e.g. Dawit Haile"
+                    value={newLead.clientName}
+                    onChange={e => setNewLead({...newLead, clientName: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <Mail size={14} className="text-blue-600" /> Email Address
+                  </label>
+                  <input 
+                    type="email"
+                    required
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all"
+                    placeholder="client@example.com"
+                    value={newLead.email}
+                    onChange={e => setNewLead({...newLead, email: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <Phone size={14} className="text-blue-600" /> Phone Number
+                  </label>
+                  <input 
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all"
+                    placeholder="+251 ..."
+                    value={newLead.phone}
+                    onChange={e => setNewLead({...newLead, phone: e.target.value})}
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <DollarSign size={14} className="text-blue-600" /> Estimated Deal Value
+                  </label>
+                  <input 
+                    type="number"
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all"
+                    placeholder="e.g. 500000"
+                    value={newLead.value}
+                    onChange={e => setNewLead({...newLead, value: Number(e.target.value)})}
+                  />
+                </div>
+                <div className="space-y-2 md:col-span-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <Home size={14} className="text-blue-600" /> Interested Property
+                  </label>
+                  <div className="relative">
+                    <select 
+                      className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold appearance-none outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white transition-all"
+                      value={newLead.propertyId}
+                      onChange={e => setNewLead({...newLead, propertyId: e.target.value})}
+                    >
+                      <option value="">General Platform Interest</option>
+                      {MOCK_PROPERTIES.map(p => (
+                        <option key={p.id} value={p.id}>{p.title}</option>
+                      ))}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <Target size={14} className="text-blue-600" /> Initial Stage
+                  </label>
+                  <div className="relative">
+                    <select 
+                      className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold appearance-none outline-none focus:ring-4 focus:ring-blue-50 focus:bg-white transition-all"
+                      value={newLead.status}
+                      onChange={e => setNewLead({...newLead, status: e.target.value as LeadStage})}
+                    >
+                      {stages.map(s => <option key={s.id} value={s.id}>{s.label}</option>)}
+                    </select>
+                    <ChevronDown className="absolute right-4 top-1/2 -translate-y-1/2 text-slate-400 pointer-events-none" size={16} />
+                  </div>
+                </div>
+                <div className="space-y-2">
+                  <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2">
+                    <Briefcase size={14} className="text-blue-600" /> Lead Source
+                  </label>
+                  <input 
+                    className="w-full px-5 py-3.5 bg-slate-50 border border-slate-100 rounded-2xl text-sm font-bold focus:ring-4 focus:ring-blue-50 focus:bg-white outline-none transition-all"
+                    placeholder="e.g. Website, Instagram, Referral"
+                    value={newLead.source}
+                    onChange={e => setNewLead({...newLead, source: e.target.value})}
+                  />
+                </div>
+              </div>
+
+              <div className="pt-6 flex gap-4">
+                <button 
+                  type="button"
+                  onClick={() => setShowAddModal(false)}
+                  className="flex-1 py-4 bg-slate-100 text-slate-600 rounded-2xl font-black text-xs uppercase tracking-widest transition-all"
+                >
+                  Cancel
+                </button>
+                <button 
+                  type="submit"
+                  className="flex-[2] py-4 bg-slate-900 text-white rounded-2xl font-black text-xs uppercase tracking-widest shadow-xl shadow-slate-200 hover:bg-blue-600 transition-all flex items-center justify-center gap-2"
+                >
+                  Create Lead Record <ChevronRight size={16} />
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+
       {/* Lead Detail Drawer / Modal Overlay */}
       {selectedLead && (
-        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[60] flex justify-end animate-in fade-in duration-300">
+        <div className="fixed inset-0 bg-slate-900/40 backdrop-blur-md z-[60] flex justify-end animate-in fade-in duration-300" onClick={() => setSelectedLead(null)}>
           <div 
             className="w-full max-w-2xl bg-white h-full shadow-2xl animate-in slide-in-from-right duration-500 overflow-hidden flex flex-col"
             onClick={e => e.stopPropagation()}

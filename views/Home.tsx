@@ -4,8 +4,8 @@ import { PropertyGrid } from '../components/PropertyGrid';
 import { MOCK_PROPERTIES, MOCK_AGENTS } from '../constants';
 import { 
   Sparkles, ArrowRight, ShieldCheck, Zap, Home as HomeIcon, 
-  Building2, Landmark, MapPin, Star, ChevronRight, UserCheck,
-  TrendingUp, Globe, Building, Navigation
+  Building2, Landmark, MapPin, Star, ChevronLeft, ChevronRight, UserCheck,
+  TrendingUp, Globe, Building, Navigation, Clock, Flame
 } from 'lucide-react';
 import { User, Language } from '../types';
 import { t } from '../services/translations';
@@ -34,6 +34,7 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
 
   // For demonstration "many" properties, we'll repeat the mock list
   const manyRecommended = [...MOCK_PROPERTIES, ...MOCK_PROPERTIES, ...MOCK_PROPERTIES].slice(0, 8);
+  const newArrivals = MOCK_PROPERTIES.slice(0, 5); // Treat first 5 as new arrivals
 
   if (isAdmin) {
     return (
@@ -112,7 +113,67 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
         </div>
       </section>
 
-      {/* 3. Recommended Discovery Grid (No Map) */}
+      {/* 3. New Arrivals (NEW SECTION) */}
+      <section className="space-y-8">
+        <div className="flex items-center justify-between px-2">
+          <div>
+            <h2 className="text-3xl font-black text-slate-900 flex items-center gap-3">
+              <Flame className="text-rose-500" size={28} /> New Arrivals
+            </h2>
+            <p className="text-slate-500 font-medium italic mt-1 ml-10">Fresh listings added to the market in the last 48 hours.</p>
+          </div>
+          <div className="flex gap-2">
+             <button className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 transition-all">
+                <ChevronLeft size={20} />
+             </button>
+             <button className="p-3 bg-white border border-slate-200 rounded-2xl text-slate-400 hover:text-blue-600 transition-all">
+                <ChevronRight size={20} />
+             </button>
+          </div>
+        </div>
+
+        <div className="flex gap-6 overflow-x-auto hide-scrollbar pb-6 px-2">
+          {newArrivals.map((p, idx) => (
+            <div 
+              key={`new-${p.id}`}
+              onClick={() => onSelectProperty?.(p.id)}
+              className="min-w-[320px] md:min-w-[400px] bg-white rounded-[40px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all cursor-pointer group relative"
+            >
+              <div className="relative h-56 overflow-hidden">
+                <img src={p.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="new prop" />
+                <div className="absolute top-4 left-4">
+                  <div className="px-4 py-1.5 bg-rose-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
+                    <Clock size={12} strokeWidth={3} /> Just Listed
+                  </div>
+                </div>
+                <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-0 group-hover:opacity-100 transition-opacity"></div>
+              </div>
+              <div className="p-6 space-y-3">
+                <div className="flex justify-between items-start">
+                   <h3 className="text-lg font-black text-slate-900 group-hover:text-blue-600 transition-colors line-clamp-1">{p.title}</h3>
+                   <p className="text-lg font-black text-blue-600 ml-4">${(p.price/1000).toFixed(0)}k</p>
+                </div>
+                <p className="text-[10px] text-slate-400 font-bold flex items-center gap-1.5 uppercase tracking-tight">
+                  <MapPin size={12} className="text-rose-400" /> {p.location}
+                </p>
+                <div className="pt-4 flex items-center gap-4 text-[9px] font-black text-slate-400 uppercase tracking-widest border-t border-slate-50">
+                  <span className="flex items-center gap-1.5"><HomeIcon size={12} /> {p.type}</span>
+                  <span className="flex items-center gap-1.5"><Navigation size={12} /> {p.area}</span>
+                </div>
+              </div>
+            </div>
+          ))}
+          {/* View More Card */}
+          <div className="min-w-[200px] flex flex-col items-center justify-center bg-blue-50 rounded-[40px] border-2 border-dashed border-blue-200 group cursor-pointer hover:bg-blue-100 transition-all">
+             <div className="p-4 bg-white rounded-full text-blue-600 shadow-xl mb-4 group-hover:scale-110 transition-transform">
+                <ArrowRight size={32} />
+             </div>
+             <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">See All New</p>
+          </div>
+        </div>
+      </section>
+
+      {/* 4. Recommended Discovery Grid */}
       <section className="space-y-8">
         <div className="flex items-center justify-between px-2">
           <div>
@@ -169,7 +230,7 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
         </div>
       </section>
 
-      {/* 4. Top Agents Section */}
+      {/* 5. Top Agents Section */}
       <section className="space-y-8">
         <div className="flex items-center justify-between px-2">
           <div>
@@ -245,7 +306,7 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
         </div>
       </section>
 
-      {/* 5. Top Score Real Estate Section */}
+      {/* 6. Top Score Real Estate Section */}
       <section className="space-y-8">
         <div className="flex items-center justify-between px-2">
           <div>

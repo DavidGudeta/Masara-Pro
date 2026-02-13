@@ -162,7 +162,8 @@ export const AddProperty: React.FC = () => {
                 </div>
                 <div className="space-y-3">
                   <label className="text-[10px] font-black text-slate-400 uppercase tracking-widest flex items-center gap-2"><Calendar size={14} /> Year Built</label>
-                  <input type="number" className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold" value={formData.yearBuilt} onChange={e => setFormData({...formData, yearBuilt: Number(e.target.value)})} />
+                  {/* Fix: use year_built property instead of yearBuilt */}
+                  <input type="number" className="w-full px-4 py-3 bg-slate-50 border border-slate-100 rounded-xl text-sm font-bold" value={formData.year_built} onChange={e => setFormData({...formData, year_built: Number(e.target.value)})} />
                 </div>
               </div>
               <div className="space-y-4">
@@ -238,7 +239,7 @@ export const AddProperty: React.FC = () => {
                 <Sparkles size={40} className="text-white" />
              </div>
              <h2 className="text-3xl font-black text-slate-900">Review & Optimize</h2>
-             <p className="text-slate-500 max-w-lg mx-auto font-medium">Your listing is almost ready. We'll use AI to optimize your description for maximum conversion based on the details provided.</p>
+             <p className="text-slate-500 max-xl lg mx-auto font-medium">Your listing is almost ready. We'll use AI to optimize your description for maximum conversion based on the details provided.</p>
              
              <div className="bg-slate-50 p-8 rounded-[40px] border border-slate-100 space-y-6 text-left max-w-2xl mx-auto">
                 <div className="space-y-2">
@@ -247,8 +248,9 @@ export const AddProperty: React.FC = () => {
                     className="w-full bg-white border border-slate-200 rounded-2xl p-6 text-sm font-medium leading-relaxed outline-none focus:ring-4 focus:ring-indigo-100"
                     rows={6}
                     placeholder="Enter or generate description..."
-                    value={formData.description}
-                    onChange={e => setFormData({...formData, description: e.target.value})}
+                    /* Fix: use full_description property instead of description */
+                    value={formData.full_description}
+                    onChange={e => setFormData({...formData, full_description: e.target.value})}
                   />
                 </div>
                 <button className="flex items-center gap-2 text-indigo-600 font-black text-xs uppercase tracking-widest hover:text-indigo-800 transition-colors">
