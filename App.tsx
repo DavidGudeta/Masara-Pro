@@ -1,5 +1,5 @@
 
-import React, { useState, useMemo } from 'react';
+import React, { useState, useMemo, useEffect } from 'react';
 import { Layout } from './components/Layout';
 import { Home } from './views/Home';
 import { Area } from './views/Area';
@@ -34,6 +34,7 @@ import { MOCK_PROPERTIES, MOCK_AGENTS } from './constants';
 
 const App: React.FC = () => {
   const [user, setUser] = useState<User | null>(null);
+  const [token, setToken] = useState<string | null>(null);
   const [currentView, setView] = useState<ViewId>('HOME');
   const [selectedPropertyId, setSelectedPropertyId] = useState<string | null>(null);
   const [selectedAgentId, setSelectedAgentId] = useState<string | null>(null);
@@ -41,6 +42,31 @@ const App: React.FC = () => {
   
   const [minPrice, setMinPrice] = useState<number | ''>('');
   const [maxPrice, setMaxPrice] = useState<number | ''>('');
+
+  // Persist session
+  useEffect(() => {
+    const savedUser = localStorage.getItem('masara_user');
+    const savedToken = localStorage.getItem('masara_token');
+    if (savedUser && savedToken) {
+      setUser(JSON.parse(savedUser));
+      setToken(savedToken);
+    }
+  }, []);
+
+  const handleSignIn = (u: User, t: string) => {
+    setUser(u);
+    setToken(t);
+    localStorage.setItem('masara_user', JSON.stringify(u));
+    localStorage.setItem('masara_token', t);
+  };
+
+  const handleLogout = () => {
+    setUser(null);
+    setToken(null);
+    localStorage.removeItem('masara_user');
+    localStorage.removeItem('masara_token');
+    setView('HOME');
+  };
 
   const filteredProperties = useMemo(() => {
     return MOCK_PROPERTIES.filter(p => {
@@ -51,7 +77,7 @@ const App: React.FC = () => {
   }, [minPrice, maxPrice]);
 
   if (!user) {
-    return <Landing onSignIn={(u) => setUser(u)} />;
+    return <Landing onSignIn={handleSignIn} />;
   }
 
   const handlePropertySelect = (id: string) => {
@@ -79,11 +105,6 @@ const App: React.FC = () => {
       setSelectedAgentId('a1');
       setView('AGENT_DETAILS');
     }
-  };
-
-  const handleLogout = () => {
-    setUser(null);
-    setView('HOME');
   };
 
   const renderContent = () => {

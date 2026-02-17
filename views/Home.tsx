@@ -1,13 +1,14 @@
 
-import React, { useState } from 'react';
+import React, { useState, useEffect } from 'react';
 import { PropertyGrid } from '../components/PropertyGrid';
 import { MOCK_PROPERTIES, MOCK_AGENTS } from '../constants';
+import api from '../services/api';
 import { 
   Sparkles, ArrowRight, ShieldCheck, Zap, Home as HomeIcon, 
   Building2, Landmark, MapPin, Star, ChevronLeft, ChevronRight, UserCheck,
   TrendingUp, Globe, Building, Navigation, Clock, Flame
 } from 'lucide-react';
-import { User, Language } from '../types';
+import { User, Language, Property } from '../types';
 import { t } from '../services/translations';
 
 interface HomeProps {
@@ -30,12 +31,29 @@ const CATEGORIES = (lang: Language) => [
 
 export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, onAgentSelect, onViewSubscriptions }) => {
   const [activeCategory, setActiveCategory] = useState('all');
+  const [properties, setProperties] = useState<Property[]>([]);
+  const [loading, setLoading] = useState(true);
+  
   const isAdmin = user?.role === 'ADMIN';
-  const promotedProperty = MOCK_PROPERTIES[0];
+  const promotedProperty = properties[0] || MOCK_PROPERTIES[0];
 
-  // For demonstration "many" properties, we'll repeat the mock list
-  const manyRecommended = [...MOCK_PROPERTIES, ...MOCK_PROPERTIES, ...MOCK_PROPERTIES].slice(0, 8);
-  const newArrivals = MOCK_PROPERTIES.slice(0, 5); // Treat first 5 as new arrivals
+  useEffect(() => {
+    const fetchProperties = async () => {
+      try {
+        const res = await api.get('/properties');
+        setProperties(res.data.length ? res.data : MOCK_PROPERTIES);
+      } catch (err) {
+        console.error("Failed to fetch real properties, using mocks", err);
+        setProperties(MOCK_PROPERTIES);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchProperties();
+  }, []);
+
+  const manyRecommended = [...properties, ...properties].slice(0, 8);
+  const newArrivals = properties.slice(0, 5);
 
   if (isAdmin) {
     return (
@@ -141,7 +159,7 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
               className="min-w-[320px] md:min-w-[400px] bg-white rounded-[40px] overflow-hidden border border-slate-100 shadow-sm hover:shadow-xl transition-all cursor-pointer group relative"
             >
               <div className="relative h-56 overflow-hidden">
-                <img src={p.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-105" alt="new prop" />
+                <img src={p.image} className="w-full h-full object-cover transition-transform duration-700 group-hover:scale-110" alt="new prop" />
                 <div className="absolute top-4 left-4">
                   <div className="px-4 py-1.5 bg-rose-600 text-white rounded-full text-[10px] font-black uppercase tracking-widest flex items-center gap-2 shadow-lg">
                     <Clock size={12} strokeWidth={3} /> Just Listed
