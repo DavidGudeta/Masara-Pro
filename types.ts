@@ -10,6 +10,19 @@ export interface User {
   subscriptionTier?: 'BASIC' | 'PRO' | 'BUSINESS';
 }
 
+export type NotificationType = 'LEAD' | 'PAYMENT' | 'SYSTEM' | 'VERIFICATION' | 'TOUR' | 'MESSAGE';
+
+export interface Notification {
+  id: string;
+  type: NotificationType;
+  title: string;
+  message: string;
+  timestamp: string;
+  isRead: boolean;
+  priority: 'LOW' | 'MEDIUM' | 'HIGH';
+  link?: ViewId;
+}
+
 export type DocumentType = 
   | 'BUSINESS_LICENSE' 
   | 'PROPERTY_OWNERSHIP' 
@@ -56,16 +69,15 @@ export type ViewId =
   | 'ACCOUNT' | 'CHANNEL' | 'LEADS' | 'INBOX' | 'DIRECTORY' | 'DASHBOARD' | 'SETTINGS' | 'SEARCHING'
   | 'PROPERTY_DETAILS' | 'AGENT_DETAILS' | 'ADD_PROPERTY' | 'SYSTEM'
   | 'VERIFICATION' | 'PROPERTIES_MGMT' | 'ROLES_MGMT' | 'REVENUE' | 'GATEWAY' | 'ANALYTICS' | 'CONTACTS' | 'CATEGORY_MGMT'
-  | 'EDIT_PROFILE' | 'CHANGE_PASSWORD' | 'CHANNEL_CREATION';
+  | 'EDIT_PROFILE' | 'CHANGE_PASSWORD' | 'CHANNEL_CREATION' | 'NOTIFICATIONS';
 
 export interface Property {
   id: string;
   title: string;
-  price: number; // Current primary display price (usually USD)
-  price_etb?: number; // Ethiopian Birr
+  price: number; 
+  price_etb?: number; 
   location: string;
   
-  // Location Variables
   country: string;
   city: string;
   sub_city: string;
@@ -73,20 +85,17 @@ export interface Property {
   landmark?: string;
   address_description?: string;
 
-  // Property Core
   type: 'HOUSE' | 'APARTMENT' | 'LAND' | 'OFFICE';
   status: 'FOR_SALE' | 'FOR_RENT';
   listing_status: 'ACTIVE' | 'SOLD' | 'PENDING';
   status_date: string;
   
-  // Finance
   payment_method?: string;
   monthly_rent_etb?: number;
   rental_status?: 'RENTED' | 'VACANT';
   furnished: boolean;
   investment_property: boolean;
 
-  // Size & Layout
   total_area_sqm: number;
   net_area_sqm: number;
   floor_number?: number;
@@ -96,14 +105,12 @@ export interface Property {
   store_room: boolean;
   units_per_floor?: number;
 
-  // Building Details
   building_type: string;
-  structure: string; // e.g. G+7
+  structure: string; 
   year_built?: number;
   parking_available: boolean;
   elevator: boolean;
 
-  // Amenities
   has_gym: boolean;
   has_sauna: boolean;
   has_steam: boolean;
@@ -112,17 +119,14 @@ export interface Property {
   security_type?: string;
   water_supply?: string;
 
-  // Legal
   digital_map_available: boolean;
   ownership_type?: string;
   legal_status?: string;
 
-  // Schedule
   viewing_monday_friday: string;
   viewing_saturday: string;
   viewing_sunday: string;
 
-  // Marketing
   headline?: string;
   short_description?: string;
   full_description?: string;
@@ -133,8 +137,8 @@ export interface Property {
   image: string;
   videoUrl?: string;
   tags: string[];
-  amenities?: string[]; // Legacy field for simpler grids
-  sqft: number; // Legacy field
+  amenities?: string[]; 
+  sqft: number; 
   
   agent?: {
     id?: string;

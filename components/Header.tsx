@@ -1,8 +1,12 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { Bell, Globe, ChevronDown, User as UserIcon, LogOut, Menu, DollarSign, X, ShoppingBag, Key } from 'lucide-react';
-import { User, ViewId, Language, UserRole } from '../types';
-import { LANGUAGES, PROFILE_ITEMS } from '../constants';
+import { 
+  Bell, Globe, ChevronDown, User as UserIcon, LogOut, Menu, 
+  DollarSign, X, ShoppingBag, Key, CheckCircle2, Zap, 
+  Target, PlayCircle, MessageSquare, ShieldCheck, AlertCircle
+} from 'lucide-react';
+import { User, ViewId, Language, UserRole, Notification } from '../types';
+import { LANGUAGES, PROFILE_ITEMS, MOCK_NOTIFICATIONS } from '../constants';
 import { t } from '../services/translations';
 
 interface HeaderProps {
@@ -35,18 +39,24 @@ export const Header: React.FC<HeaderProps> = ({
   const [profileOpen, setProfileOpen] = useState(false);
   const [langOpen, setLangOpen] = useState(false);
   const [priceOpen, setPriceOpen] = useState(false);
+  const [notificationsOpen, setNotificationsOpen] = useState(false);
   
   const profileRef = useRef<HTMLDivElement>(null);
   const priceRef = useRef<HTMLDivElement>(null);
+  const notifRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
     const handleClickOutside = (event: MouseEvent) => {
-      if (profileRef.current && !profileRef.current.contains(event.target as Node)) {
+      const target = event.target as Node;
+      if (profileRef.current && !profileRef.current.contains(target)) {
         setProfileOpen(false);
         setLangOpen(false);
       }
-      if (priceRef.current && !priceRef.current.contains(event.target as Node)) {
+      if (priceRef.current && !priceRef.current.contains(target)) {
         setPriceOpen(false);
+      }
+      if (notifRef.current && !notifRef.current.contains(target)) {
+        setNotificationsOpen(false);
       }
     };
     document.addEventListener('mousedown', handleClickOutside);
@@ -58,6 +68,18 @@ export const Header: React.FC<HeaderProps> = ({
   };
 
   const filteredProfileItems = PROFILE_ITEMS.filter(item => (item.roles as readonly UserRole[]).includes(user.role));
+  const unreadCount = MOCK_NOTIFICATIONS.filter(n => !n.isRead).length;
+
+  const getNotifIcon = (type: Notification['type']) => {
+    switch(type) {
+      case 'LEAD': return <Target className="text-blue-500" size={16} />;
+      case 'PAYMENT': return <Zap className="text-amber-500" size={16} />;
+      case 'VERIFICATION': return <ShieldCheck className="text-emerald-500" size={16} />;
+      case 'TOUR': return <PlayCircle className="text-purple-500" size={16} />;
+      case 'MESSAGE': return <MessageSquare className="text-indigo-500" size={16} />;
+      default: return <AlertCircle className="text-slate-500" size={16} />;
+    }
+  };
 
   return (
     <header className="h-16 bg-white border-b border-slate-100 px-4 md:px-8 flex items-center justify-between sticky top-0 z-40 transition-all">
@@ -171,10 +193,60 @@ export const Header: React.FC<HeaderProps> = ({
           )}
         </div>
 
-        <button className="p-2.5 rounded-2xl hover:bg-slate-50 text-slate-500 relative transition-all group">
-          <Bell size={18} strokeWidth={2.5} className="group-hover:rotate-12 transition-transform" />
-          <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-600 rounded-full border-2 border-white animate-pulse"></span>
-        </button>
+        {/* Notification Bell Dropdown */}
+        <div className="relative" ref={notifRef}>
+          <button 
+            onClick={() => setNotificationsOpen(!notificationsOpen)}
+            className={`p-2.5 rounded-2xl hover:bg-slate-50 text-slate-500 relative transition-all group ${notificationsOpen ? 'bg-slate-100 text-blue-600' : ''}`}
+          >
+            <Bell size={18} strokeWidth={2.5} className="group-hover:rotate-12 transition-transform" />
+            {unreadCount > 0 && (
+              <span className="absolute top-2.5 right-2.5 w-2 h-2 bg-rose-600 rounded-full border-2 border-white animate-pulse"></span>
+            )}
+          </button>
+          
+          {notificationsOpen && (
+            <div className="absolute right-[-60px] md:right-0 mt-3 w-80 md:w-96 bg-white rounded-[32px] shadow-[0_20px_60px_-15px_rgba(0,0,0,0.15)] border border-slate-100 py-4 animate-in zoom-in-95 duration-200">
+              <div className="px-6 py-4 border-b border-slate-50 mb-3 flex items-center justify-between">
+                 <div>
+                   <p className="text-sm font-black text-slate-900">Notifications</p>
+                   <p className="text-[10px] text-slate-400 font-bold uppercase tracking-widest">{unreadCount} Unread Messages</p>
+                 </div>
+                 <button className="text-[10px] font-black text-blue-600 uppercase hover:underline decoration-2">Mark all read</button>
+              </div>
+
+              <div className="max-h-[400px] overflow-y-auto hide-scrollbar px-2 space-y-1">
+                 {MOCK_NOTIFICATIONS.map((n) => (
+                   <button 
+                    key={n.id}
+                    onClick={() => { n.link && setView(n.link); setNotificationsOpen(false); }}
+                    className={`w-full flex items-start gap-4 p-4 rounded-2xl text-left transition-all ${n.isRead ? 'hover:bg-slate-50 opacity-60' : 'bg-blue-50/30 hover:bg-blue-50/50'}`}
+                   >
+                     <div className={`p-2 rounded-xl shrink-0 ${n.isRead ? 'bg-slate-100' : 'bg-white shadow-sm'}`}>
+                        {getNotifIcon(n.type)}
+                     </div>
+                     <div className="flex-1 space-y-1">
+                        <div className="flex items-center justify-between">
+                           <p className={`text-xs font-black ${n.isRead ? 'text-slate-600' : 'text-slate-900'}`}>{n.title}</p>
+                           <span className="text-[9px] font-bold text-slate-400 uppercase">{n.timestamp}</span>
+                        </div>
+                        <p className="text-[11px] text-slate-500 font-medium leading-relaxed line-clamp-2">{n.message}</p>
+                     </div>
+                   </button>
+                 ))}
+              </div>
+
+              <div className="px-4 pt-4 border-t border-slate-50 mt-2">
+                 <button 
+                  onClick={() => { setView('NOTIFICATIONS'); setNotificationsOpen(false); }}
+                  className="w-full py-3 bg-slate-900 text-white rounded-2xl text-[10px] font-black uppercase tracking-widest hover:bg-blue-600 transition-colors"
+                 >
+                  View All Alerts
+                 </button>
+              </div>
+            </div>
+          )}
+        </div>
 
         <div className="w-px h-8 bg-slate-100 mx-1 hidden sm:block"></div>
 

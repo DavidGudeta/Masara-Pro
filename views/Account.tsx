@@ -2,7 +2,7 @@
 import React, { useState } from 'react';
 import { 
   User, Mail, Shield, Smartphone, Camera, ChevronRight, Lock, Video, 
-  Building2, Sparkles, CheckCircle2, ShieldAlert
+  Building2, Sparkles, CheckCircle2, ShieldAlert, PlusCircle
 } from 'lucide-react';
 import { User as UserType } from '../types';
 
@@ -11,7 +11,7 @@ interface AccountProps {
   setUser: (user: UserType) => void;
 }
 
-type AccountTab = 'PROFILE' | 'PASSWORD' | 'REAL_ESTATE' | 'ROLES';
+type AccountTab = 'PROFILE' | 'PASSWORD' | 'CHANNEL_SETUP' | 'ROLES';
 
 export const Account: React.FC<AccountProps> = ({ user, setUser }) => {
   const [activeTab, setActiveTab] = useState<AccountTab>('PROFILE');
@@ -20,7 +20,7 @@ export const Account: React.FC<AccountProps> = ({ user, setUser }) => {
   const tabs = [
     { id: 'PROFILE' as AccountTab, label: 'Edit Profile', icon: <User size={18} /> },
     { id: 'PASSWORD' as AccountTab, label: 'Change Password', icon: <Lock size={18} /> },
-    { id: 'REAL_ESTATE' as AccountTab, label: 'Real Estate Setup', icon: <Building2 size={18} /> },
+    { id: 'CHANNEL_SETUP' as AccountTab, label: 'Owner Channel Setup', icon: <Building2 size={18} /> },
     { id: 'ROLES' as AccountTab, label: 'Role Management', icon: <Shield size={18} /> },
   ];
 
@@ -141,11 +141,11 @@ export const Account: React.FC<AccountProps> = ({ user, setUser }) => {
              </div>
            )}
 
-           {activeTab === 'REAL_ESTATE' && (
+           {activeTab === 'CHANNEL_SETUP' && (
              <div className="space-y-8 animate-fadeIn">
                 <div className="space-y-1">
-                  <h3 className="text-2xl font-black text-slate-900">Real Estate Setup</h3>
-                  <p className="text-slate-500 text-sm font-medium">Manage your professional real estate brand or property owner name.</p>
+                  <h3 className="text-2xl font-black text-slate-900">Owner Channel Setup</h3>
+                  <p className="text-slate-500 text-sm font-medium">Manage your personal property channel or agency brand identity on Masara.</p>
                 </div>
 
                 <div className="bg-indigo-50/50 p-10 rounded-[40px] border border-indigo-100 text-center space-y-6">
@@ -153,12 +153,17 @@ export const Account: React.FC<AccountProps> = ({ user, setUser }) => {
                       <Video size={32} />
                    </div>
                    <div className="space-y-2">
-                      <h4 className="text-xl font-black text-indigo-900">Launch Your Real Estate Brand</h4>
-                      <p className="text-indigo-700/70 text-sm max-w-md mx-auto font-medium">Set up your owner name or company profile to start publishing property tours.</p>
+                      <h4 className="text-xl font-black text-indigo-900">Launch Your Professional Channel</h4>
+                      <p className="text-indigo-700/70 text-sm max-w-md mx-auto font-medium">Set up your unique channel to showcase properties with immersive video tours and market insights.</p>
                    </div>
-                   <button className="px-12 py-5 bg-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 hover:scale-105 transition-all text-xs uppercase tracking-widest">
-                      Enter Real Estate Setup
-                   </button>
+                   <div className="flex flex-col sm:flex-row items-center justify-center gap-4">
+                     <button className="w-full sm:w-auto px-12 py-5 bg-indigo-600 text-white font-black rounded-2xl shadow-xl shadow-indigo-200 hover:scale-105 transition-all text-xs uppercase tracking-widest">
+                        Enter Setup
+                     </button>
+                     <button className="w-full sm:w-auto px-12 py-5 bg-slate-900 text-white font-black rounded-2xl shadow-xl shadow-slate-200 hover:scale-105 transition-all text-xs uppercase tracking-widest flex items-center justify-center gap-2">
+                        <PlusCircle size={18} /> Create Channel
+                     </button>
+                   </div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">

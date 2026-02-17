@@ -5,9 +5,9 @@ import {
   User, Tv, Target, Mail, FolderCheck, LayoutDashboard, Settings, LogOut, Search,
   Users, DollarSign, Shield, Building, Briefcase, PlusCircle, PlayCircle, Settings2,
   ShieldCheck, BarChart3, CreditCard as CardIcon, Globe, UserPen, Lock, Video,
-  UserCheck, Layers, Zap
+  UserCheck, Layers, Zap, Bell
 } from 'lucide-react';
-import { ViewId, UserRole, Property, Lead, Chat, Message, DirectoryDocument, Agent } from './types';
+import { ViewId, UserRole, Property, Lead, Chat, Message, DirectoryDocument, Agent, Notification } from './types';
 
 export const NAV_ITEMS = [
   { id: 'HOME', labelKey: 'home', icon: <Home size={20} />, roles: ['CUSTOMER', 'AGENTS'] },
@@ -25,6 +25,7 @@ export const NAV_ITEMS = [
   { id: 'AREA', labelKey: 'area', icon: <Map size={20} />, roles: ['ADMIN', 'CUSTOMER', 'AGENTS'] },
   { id: 'TOUR', labelKey: 'tour', icon: <PlayCircle size={20} />, roles: ['CUSTOMER'] },
   { id: 'WISH', labelKey: 'saved', icon: <Heart size={20} />, roles: ['CUSTOMER', 'AGENTS'] },
+  { id: 'NOTIFICATIONS', labelKey: 'notifications', icon: <Bell size={20} />, roles: ['CUSTOMER', 'AGENTS', 'ADMIN'] },
   { id: 'TRENDING', labelKey: 'trending', icon: <Flame size={20} />, roles: ['CUSTOMER'] },
   { id: 'REQUEST', labelKey: 'request', icon: <Send size={20} />, roles: ['CUSTOMER'] },
   { id: 'LEADS', labelKey: 'leads', icon: <Target size={20} />, roles: ['AGENTS'] },
@@ -48,6 +49,58 @@ export const LANGUAGES = [
   { code: 'TI', name: 'Tigrigna' },
   { code: 'AM', name: 'Amharic' },
   { code: 'SW', name: 'Swahili' },
+];
+
+export const MOCK_NOTIFICATIONS: Notification[] = [
+  {
+    id: 'n1',
+    type: 'LEAD',
+    title: 'New High-Value Lead',
+    message: 'David Chen expressed interest in "Modern Luxury Apartment in Bole".',
+    timestamp: '2 min ago',
+    isRead: false,
+    priority: 'HIGH',
+    link: 'LEADS'
+  },
+  {
+    id: 'n2',
+    type: 'VERIFICATION',
+    title: 'Document Verified',
+    message: 'Your Business License has been successfully approved by the Compliance Team.',
+    timestamp: '1 hour ago',
+    isRead: false,
+    priority: 'MEDIUM',
+    link: 'DIRECTORY'
+  },
+  {
+    id: 'n3',
+    type: 'PAYMENT',
+    title: 'Subscription Renewed',
+    message: 'Your Pro Plan subscription has been renewed for another month.',
+    timestamp: '5 hours ago',
+    isRead: true,
+    priority: 'LOW',
+    link: 'SUBSCRIPTION'
+  },
+  {
+    id: 'n4',
+    type: 'TOUR',
+    title: 'Tour Scheduled',
+    message: 'A virtual tour has been booked for Sunday at 10:30 AM.',
+    timestamp: '1 day ago',
+    isRead: true,
+    priority: 'MEDIUM',
+    link: 'INBOX'
+  },
+  {
+    id: 'n5',
+    type: 'SYSTEM',
+    title: 'Security Maintenance',
+    message: 'Platform maintenance is scheduled for this Sunday between 2AM-4AM.',
+    timestamp: '2 days ago',
+    isRead: true,
+    priority: 'LOW'
+  }
 ];
 
 export const MOCK_AGENTS: Agent[] = [

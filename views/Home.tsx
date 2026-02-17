@@ -14,7 +14,8 @@ interface HomeProps {
   user?: User;
   language: Language;
   onSelectProperty?: (id: string) => void;
-  onChannelSelect?: (agentName: string) => void;
+  onAgentSelect?: (agentName: string) => void;
+  onViewSubscriptions?: () => void;
 }
 
 const CATEGORIES = (lang: Language) => [
@@ -27,7 +28,7 @@ const CATEGORIES = (lang: Language) => [
   { id: 'diplomatic', labelKey: 'diplomatic', icon: <ShieldCheck size={18} /> },
 ];
 
-export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, onChannelSelect }) => {
+export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, onAgentSelect, onViewSubscriptions }) => {
   const [activeCategory, setActiveCategory] = useState('all');
   const isAdmin = user?.role === 'ADMIN';
   const promotedProperty = MOCK_PROPERTIES[0];
@@ -113,7 +114,7 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
         </div>
       </section>
 
-      {/* 3. New Arrivals (NEW SECTION) */}
+      {/* 3. New Arrivals */}
       <section className="space-y-8">
         <div className="flex items-center justify-between px-2">
           <div>
@@ -249,7 +250,7 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
             return (
               <div 
                 key={agent.id}
-                onClick={() => onChannelSelect?.(agent.name)}
+                onClick={() => onAgentSelect?.(agent.name)}
                 className="bg-white p-8 rounded-[40px] border border-slate-100 shadow-sm hover:shadow-xl hover:border-blue-100 transition-all group cursor-pointer text-center space-y-5"
               >
                 <div className="relative inline-block">
@@ -299,7 +300,10 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
               <h3 className="font-black text-lg">Sell with Masara</h3>
               <p className="text-slate-400 text-[10px] uppercase font-bold tracking-tight">Join Ethiopia's Elite Network</p>
             </div>
-            <button className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all">
+            <button 
+              onClick={onViewSubscriptions}
+              className="w-full py-4 bg-blue-600 text-white font-black rounded-2xl text-[10px] uppercase tracking-widest shadow-lg shadow-blue-500/20 hover:bg-blue-700 transition-all"
+            >
               Apply as Agent
             </button>
           </div>

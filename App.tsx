@@ -19,6 +19,7 @@ import { AddProperty } from './views/AddProperty';
 import { Tour } from './views/Tour';
 import { Landing } from './views/Landing';
 import { Saved } from './views/Saved';
+import { Notifications } from './views/Notifications';
 import { PropertyMgmt } from './views/admin/PropertyMgmt';
 import { VerificationMgmt } from './views/admin/VerificationMgmt';
 import { RolesMgmt } from './views/admin/RolesMgmt';
@@ -87,10 +88,19 @@ const App: React.FC = () => {
 
   const renderContent = () => {
     switch (currentView) {
-      case 'HOME': return <Home user={user} language={language} onSelectProperty={handlePropertySelect} onChannelSelect={handleAgentSelect} />;
+      case 'HOME': return (
+        <Home 
+          user={user} 
+          language={language} 
+          onSelectProperty={handlePropertySelect} 
+          onAgentSelect={handleAgentDetailsSelect} 
+          onViewSubscriptions={() => setView('SUBSCRIPTION')}
+        />
+      );
       case 'AREA': return <Area onSelectProperty={handlePropertySelect} onChannelSelect={handleAgentSelect} />;
       case 'TOUR': return <Tour onSelectProperty={handlePropertySelect} onChannelSelect={handleAgentSelect} />;
       case 'WISH': return <Saved onSelectProperty={handlePropertySelect} />;
+      case 'NOTIFICATIONS': return <Notifications setView={setView} />;
       case 'DASHBOARD': return <Dashboard user={user} onNewListing={() => setView('ADD_PROPERTY')} />;
       case 'SUBSCRIPTION': return <Subscription />;
       case 'ACCOUNT': return <Account user={user} setUser={setUser} />;
@@ -144,7 +154,15 @@ const App: React.FC = () => {
           <PropertyGrid onSelect={handlePropertySelect} onChannelSelect={handleAgentSelect} properties={filteredProperties.filter(p => p.status === 'FOR_RENT')} />
         </div>
       );
-      default: return <Home user={user} language={language} onSelectProperty={handlePropertySelect} onChannelSelect={handleAgentSelect} />;
+      default: return (
+        <Home 
+          user={user} 
+          language={language} 
+          onSelectProperty={handlePropertySelect} 
+          onAgentSelect={handleAgentDetailsSelect} 
+          onViewSubscriptions={() => setView('SUBSCRIPTION')}
+        />
+      );
     }
   };
 
