@@ -1,7 +1,6 @@
 
 import React, { useState, useEffect } from 'react';
 import { User, UserRole } from '../types';
-import api from '../services/api';
 import { 
   Building2, LogIn, Sparkles, Globe, Shield, Users, 
   ChevronRight, Play, CheckCircle,
@@ -49,23 +48,69 @@ export const Landing: React.FC<LandingProps> = ({ onSignIn }) => {
     setLoading(true);
     setError(null);
 
-    const endpoint = isSignUp ? '/auth/signup' : '/auth/login';
-    const payload = isSignUp 
-      ? { email, password, name, role: selectedRole }
-      : { email, password };
+    // Simulate network delay
+    await new Promise(resolve => setTimeout(resolve, 1000));
 
     try {
-      const response = await api.post(endpoint, payload);
-      const data = response.data;
-
       if (isSignUp) {
+        // Mock Signup
+        const newUser: User = {
+          id: Math.random().toString(36).substr(2, 9),
+          name: name || 'Demo User',
+          email: email,
+          role: selectedRole,
+          avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+          subscriptionTier: 'BASIC'
+        };
+        
+        // In a real app we'd save this to a DB. Here we just simulate success.
         setIsSignUp(false);
-        setError('Account created! Please sign in.');
+        setError('Account created! Please sign in with your credentials.');
       } else {
-        onSignIn(data.user, data.token);
+        // Mock Login
+        let mockUser: User | null = null;
+
+        // Special demo accounts
+        if (email === 'admin@masara.com') {
+          mockUser = {
+            id: 'admin-1',
+            name: 'System Admin',
+            email: 'admin@masara.com',
+            role: 'ADMIN',
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=admin',
+          };
+        } else if (email === 'agent@masara.com') {
+          mockUser = {
+            id: 'agent-1',
+            name: 'Premium Agent',
+            email: 'agent@masara.com',
+            role: 'AGENTS',
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=agent',
+            subscriptionTier: 'PRO'
+          };
+        } else if (email === 'customer@masara.com') {
+          mockUser = {
+            id: 'customer-1',
+            name: 'Home Seeker',
+            email: 'customer@masara.com',
+            role: 'CUSTOMER',
+            avatar: 'https://api.dicebear.com/7.x/avataaars/svg?seed=customer',
+          };
+        } else {
+          // Generic login for any other email
+          mockUser = {
+            id: Math.random().toString(36).substr(2, 9),
+            name: email.split('@')[0],
+            email: email,
+            role: 'CUSTOMER',
+            avatar: `https://api.dicebear.com/7.x/avataaars/svg?seed=${email}`,
+          };
+        }
+
+        onSignIn(mockUser, 'mock-jwt-token');
       }
     } catch (err: any) {
-      setError(err.response?.data?.error || err.message || 'Authentication failed');
+      setError('Authentication failed. Please try again.');
     } finally {
       setLoading(false);
     }
@@ -192,6 +237,31 @@ export const Landing: React.FC<LandingProps> = ({ onSignIn }) => {
                 {isSignUp ? 'Already have an account? Sign In' : 'New to Masara? Create Account'}
               </button>
             </div>
+
+            {!isSignUp && (
+              <div className="pt-6 border-t border-slate-50">
+                <p className="text-[10px] font-black text-slate-400 uppercase tracking-widest text-center mb-4">Quick Demo Access</p>
+                <div className="grid grid-cols-3 gap-2">
+                  {[
+                    { role: 'Admin', email: 'admin@masara.com' },
+                    { role: 'Agent', email: 'agent@masara.com' },
+                    { role: 'Customer', email: 'customer@masara.com' }
+                  ].map((demo) => (
+                    <button
+                      key={demo.role}
+                      type="button"
+                      onClick={() => {
+                        setEmail(demo.email);
+                        setPassword('password123');
+                      }}
+                      className="py-2 rounded-xl bg-slate-50 border border-slate-100 text-[10px] font-black text-slate-500 hover:bg-blue-50 hover:border-blue-100 hover:text-blue-600 transition-all"
+                    >
+                      {demo.role}
+                    </button>
+                  ))}
+                </div>
+              </div>
+            )}
           </div>
         </div>
       </div>

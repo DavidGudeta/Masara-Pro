@@ -41,7 +41,11 @@ export const Home: React.FC<HomeProps> = ({ user, language, onSelectProperty, on
     const fetchProperties = async () => {
       try {
         const res = await api.get('/properties');
-        setProperties(res.data.length ? res.data : MOCK_PROPERTIES);
+        if (res.data && Array.isArray(res.data)) {
+          setProperties(res.data.length ? res.data : MOCK_PROPERTIES);
+        } else {
+          setProperties(MOCK_PROPERTIES);
+        }
       } catch (err) {
         console.error("Failed to fetch real properties, using mocks", err);
         setProperties(MOCK_PROPERTIES);

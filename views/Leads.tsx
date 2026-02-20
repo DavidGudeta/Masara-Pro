@@ -36,8 +36,11 @@ export const Leads: React.FC<LeadsProps> = ({ user }) => {
     const fetchLeads = async () => {
       try {
         const res = await api.get('/leads/my');
-        // Map backend response to frontend Lead type if necessary
-        setLeads(res.data.length ? res.data : MOCK_LEADS);
+        if (res.data && Array.isArray(res.data)) {
+          setLeads(res.data.length ? res.data : MOCK_LEADS);
+        } else {
+          setLeads(MOCK_LEADS);
+        }
       } catch (err) {
         console.error("Using mock leads due to fetch error");
         setLeads(MOCK_LEADS);

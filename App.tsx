@@ -58,6 +58,15 @@ const App: React.FC = () => {
     setToken(t);
     localStorage.setItem('masara_user', JSON.stringify(u));
     localStorage.setItem('masara_token', t);
+    
+    // Set initial view based on role
+    if (u.role === 'ADMIN') {
+      setView('ANALYTICS');
+    } else if (u.role === 'AGENTS') {
+      setView('DASHBOARD');
+    } else {
+      setView('HOME');
+    }
   };
 
   const handleLogout = () => {

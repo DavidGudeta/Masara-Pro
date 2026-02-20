@@ -16,9 +16,14 @@ export const Saved: React.FC<{ onSelectProperty: (id: string) => void }> = ({ on
     const fetchWishlist = async () => {
       try {
         const res = await api.get('/users/wishlist');
-        setWishList(res.data);
+        if (res.data && Array.isArray(res.data)) {
+          setWishList(res.data);
+        } else {
+          setWishList([]);
+        }
       } catch (err) {
         console.error("Wishlist fetch failed");
+        setWishList([]);
       } finally {
         setLoading(false);
       }
